@@ -1,0 +1,135 @@
+═══════════════════════════════════════════════════════════════
+    INSTRUCTIONS MANUELLES - DÉMARRAGE DU PROJET DURALUX
+═══════════════════════════════════════════════════════════════
+
+⚠️ PROBLÈME DÉTECTÉ :
+Node.js et npm ne semblent pas être installés ou configurés correctement
+dans votre environnement système.
+
+═══════════════════════════════════════════════════════════════
+    SOLUTION 1 : INSTALLATION NODE.JS (RECOMMANDÉ)
+═══════════════════════════════════════════════════════════════
+
+1. Téléchargez Node.js depuis : https://nodejs.org/
+   - Choisissez la version LTS (Long Term Support)
+   - Téléchargez le fichier .msi pour Windows
+
+2. Exécutez l'installateur :
+   - Double-cliquez sur le fichier téléchargé
+   - Suivez les instructions
+   - ✅ Cochez "Automatically install necessary tools"
+   - Redémarrez votre ordinateur après l'installation
+
+3. Vérifiez l'installation :
+   - Ouvrez un NOUVEAU terminal/invite de commandes
+   - Tapez : node --version
+   - Tapez : npm --version
+   - Vous devriez voir les numéros de version
+
+4. Lancez le projet :
+   - Ouvrez le dossier du projet dans l'explorateur
+   - Double-cliquez sur start.bat
+   OU
+   - Ouvrez un terminal dans le dossier du projet
+   - Exécutez : npm install
+   - Puis : npm run dev
+
+═══════════════════════════════════════════════════════════════
+    SOLUTION 2 : SI NODE.JS EST DÉJÀ INSTALLÉ
+═══════════════════════════════════════════════════════════════
+
+Si Node.js est déjà installé mais les commandes ne fonctionnent pas :
+
+1. Redémarrez votre ordinateur
+   Cela rafraîchit les variables d'environnement
+
+2. Ouvrez un NOUVEAU terminal Windows (cmd ou PowerShell)
+   - Appuyez sur Windows + R
+   - Tapez : cmd
+   - Appuyez sur Entrée
+
+3. Naviguez vers le dossier du projet :
+   cd c:\Users\laari\Downloads\Duralux-admin-1.0.0\Duralux-admin-1.0.0\duralux-react
+
+4. Exécutez les commandes :
+   npm install
+   npm run dev
+
+═══════════════════════════════════════════════════════════════
+    SOLUTION 3 : UTILISER L'EXPLORATEUR DE FICHIERS
+═══════════════════════════════════════════════════════════════
+
+MÉTHODE LA PLUS SIMPLE :
+
+1. Ouvrez l'Explorateur Windows
+
+2. Naviguez vers :
+   c:\Users\laari\Downloads\Duralux-admin-1.0.0\Duralux-admin-1.0.0\duralux-react
+
+3. Double-cliquez sur le fichier : start.bat
+
+   Le script va automatiquement :
+   ✅ Vérifier Node.js
+   ✅ Installer les dépendances
+   ✅ Lancer le serveur
+   
+   Si vous voyez une erreur "Node.js n'est pas installé",
+   retournez à la SOLUTION 1.
+
+═══════════════════════════════════════════════════════════════
+    ALTERNATIVE : UTILISER VISUAL STUDIO CODE
+═══════════════════════════════════════════════════════════════
+
+Si vous avez VS Code installé :
+
+1. Ouvrez VS Code
+
+2. Ouvrez le dossier du projet :
+   Fichier → Ouvrir le dossier
+   Sélectionnez : duralux-react
+
+3. Ouvrez le terminal intégré :
+   Terminal → Nouveau terminal
+
+4. Exécutez :
+   npm install
+   npm run dev
+
+═══════════════════════════════════════════════════════════════
+    CE QUI DEVRAIT SE PASSER
+═══════════════════════════════════════════════════════════════
+
+Une fois que npm fonctionne correctement :
+
+1. La commande "npm install" va :
+   - Télécharger toutes les dépendances
+   - Créer un dossier node_modules
+   - Prendre 1-3 minutes
+
+2. La commande "npm run dev" va :
+   - Démarrer le serveur Vite
+   - Afficher : "Local: http://localhost:3000"
+   - Ouvrir automatiquement votre navigateur
+
+3. Vous verrez l'application Duralux CRM dans votre navigateur
+
+═══════════════════════════════════════════════════════════════
+    AIDE SUPPLÉMENTAIRE
+═══════════════════════════════════════════════════════════════
+
+📁 Emplacement du projet :
+c:\Users\laari\Downloads\Duralux-admin-1.0.0\Duralux-admin-1.0.0\duralux-react
+
+📝 Fichiers importants créés :
+- start.bat              → Démarre le serveur
+- build.bat              → Crée le build de production
+- create-executable.bat  → Crée un fichier .exe
+- README.md              → Documentation
+- server.js              → Serveur pour l'exécutable
+
+📚 Documentation complète :
+Consultez le fichier walkthrough.md dans le dossier brain
+
+═══════════════════════════════════════════════════════════════
+
+Créé le : 2026-01-28
