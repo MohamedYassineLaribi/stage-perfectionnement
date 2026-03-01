@@ -109,7 +109,7 @@ const generateInvoicePdf = async (req, res) => {
         doc.pipe(res);
 
         // Header
-        doc.fontSize(20).text('DURALUX', 110, 57)
+        doc.fontSize(20).text('CRM APP', 110, 57)
             .fontSize(10).text('123 Avenue de la Rénovation', 200, 65, { align: 'right' })
             .text('75000 Paris, France', 200, 80, { align: 'right' })
             .moveDown();

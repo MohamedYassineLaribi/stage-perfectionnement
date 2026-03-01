@@ -38,15 +38,15 @@ app.use('/api/settings', settingsRoutes);
 
 // Health check
 app.get('/', (req, res) => {
-    res.json({ message: 'API Duralux CRM en ligne' });
+    res.json({ message: 'API CRM APP en ligne' });
 });
 
 // Database Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/duralux_crm';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/crm_app';
 
 mongoose.connect(MONGODB_URI)
     .then(async () => {
-        console.log('✅ Connecté à MongoDB');
+        console.log(' Connecté à MongoDB');
 
         // Seed default admin user
         // Seed Permissions
@@ -98,7 +98,7 @@ mongoose.connect(MONGODB_URI)
         }
 
         // Seed default admin user
-        const adminEmail = 'admin@duralux.com';
+        const adminEmail = 'admin@crm.com';
         const existingAdmin = await User.findOne({ email: adminEmail });
         if (!existingAdmin) {
             await User.create({
@@ -107,11 +107,11 @@ mongoose.connect(MONGODB_URI)
                 password: 'admin123',
                 role: adminRole._id
             });
-            console.log('✨ Admin créé: admin@duralux.com / admin123');
+            console.log(' Admin créé: admin@crm.com / admin123');
         }
 
         // Seed default commercial user
-        const commEmail = 'commercial@duralux.com';
+        const commEmail = 'commercial@crm.com';
         const existingComm = await User.findOne({ email: commEmail });
         if (!existingComm) {
             await User.create({
@@ -120,16 +120,16 @@ mongoose.connect(MONGODB_URI)
                 password: 'commercial123',
                 role: commRole._id
             });
-            console.log('✨ Commercial créé: commercial@duralux.com / commercial123');
+            console.log(' Commercial créé: commercial@crm.com / commercial123');
         }
     })
     .catch(err => {
-        console.error('❌ Erreur de connexion MongoDB:', err.message);
-        console.log('⚠️ Assurez-vous que MongoDB est installé et en cours d\'exécution sur ' + MONGODB_URI);
+        console.error(' Erreur de connexion MongoDB:', err.message);
+        console.log(' Assurez-vous que MongoDB est installé et en cours d\'exécution sur ' + MONGODB_URI);
     });
 
 // Port
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
-    console.log(`🚀 Serveur backend démarré sur http://localhost:${PORT}`);
+    console.log(` Serveur backend démarré sur http://localhost:${PORT}`);
 });

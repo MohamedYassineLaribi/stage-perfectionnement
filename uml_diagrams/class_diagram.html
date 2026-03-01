@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagramme de Classes - CRM Application</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #1a365d;
+            margin-bottom: 8px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #4a6fa5;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .diagram-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
+            padding: 40px 20px;
+            width: 100%;
+            max-width: 1400px;
+            overflow-x: auto;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            min-width: 1000px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>📐 Diagramme de Classes</h1>
+    <p class="subtitle">CRM Application — Stack MERN · Toutes les classes et méthodes développées</p>
+
+    <div class="diagram-container">
+        <div class="mermaid">
+            %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#1a365d', 'primaryTextColor': '#ffffff',
+            'primaryBorderColor': '#2b4c8c', 'lineColor': '#4a6fa5', 'secondaryColor': '#dbeafe', 'fontSize': '12px'}}
+            }%%
+            classDiagram
+            direction TB
+
+            class User {
+            +ObjectId _id
+            +String name
+            +String email
+            +String password
+            +String avatar
+            +Date createdAt
+            +ObjectId role
+            +comparePassword(candidatePassword) Boolean
+            }
+
+            class Role {
+            +ObjectId _id
+            +String name
+            +String description
+            +Date createdAt
+            +ObjectId[] permissions
+            +getRoles() List~Role~
+            +createRole(name, description, permissions) Role
+            +updateRole(id, data) Role
+            +deleteRole(id) void
+            }
+
+            class Permission {
+            +ObjectId _id
+            +String name
+            +String description
+            }
+
+            class Contact {
+            +ObjectId _id
+            +String type
+            +String email
+            +String phone
+            +String address
+            +String firstName
+            +String lastName
+            +String companyName
+            +String taxId
+            +Date createdAt
+            +ObjectId salesPerson
+            +displayName() String
+            +getContacts() List~Contact~
+            +getContactById(id) Contact
+            +createContact(data) Contact
+            +updateContact(id, data) Contact
+            +deleteContact(id) void
+            }
+
+            class Article {
+            +ObjectId _id
+            +String name
+            +String description
+            +String type
+            +Number price
+            +String stockString
+            +Number stockQuantity
+            +Boolean isActive
+            +Date createdAt
+            +getArticles() List~Article~
+            +getArticleById(id) Article
+            +createArticle(data) Article
+            +updateArticle(id, data) Article
+            +deleteArticle(id) void
+            }
+
+            class Offer {
+            +ObjectId _id
+            +String reference
+            +String title
+            +String offerType
+            +String status
+            +Number totalAmountHT
+            +Number taxRate
+            +Number totalAmountTTC
+            +Date validUntil
+            +String notes
+            +Date createdAt
+            +Date updatedAt
+            +ObjectId client
+            +ObjectId salesPerson
+            +calculateTotals() void
+            +getOffers() List~Offer~
+            +getOfferById(id) Offer
+            +createOffer(data) Offer
+            +updateOffer(id, data) Offer
+            +deleteOffer(id) void
+            +convertOfferToOrder(id) Order
+            }
+
+            class OfferItem {
+            +ObjectId article
+            +String description
+            +Number quantity
+            +Number unitPrice
+            +Number discount
+            +Number totalLine
+            }
+
+            class Order {
+            +ObjectId _id
+            +String reference
+            +String status
+            +String billingAddress
+            +String shippingAddress
+            +Number totalAmountHT
+            +Number totalAmountTTC
+            +Date createdAt
+            +Date updatedAt
+            +ObjectId sourceOffer
+            +ObjectId client
+            +ObjectId salesPerson
+            +ObjectId invoice
+            +getOrders() List~Order~
+            +getOrderById(id) Order
+            +createOrder(data) Order
+            +updateOrderStatus(id, status) Order
+            }
+
+            class OrderItem {
+            +ObjectId article
+            +String description
+            +Number quantity
+            +Number unitPrice
+            +Number discount
+            +Number totalLine
+            }
+
+            class Invoice {
+            +ObjectId _id
+            +String reference
+            +String status
+            +Number amountDue
+            +Number amountPaid
+            +Date dueDate
+            +Date paidAt
+            +String paymentMethod
+            +Date createdAt
+            +ObjectId order
+            +ObjectId client
+            +getInvoices() List~Invoice~
+            +getInvoiceById(id) Invoice
+            +createInvoice(orderId, dueDate) Invoice
+            +generateInvoicePdf(id) PDF
+            }
+
+            class Lead {
+            +ObjectId _id
+            +String name
+            +String email
+            +String phone
+            +String company
+            +String source
+            +String status
+            +String notes
+            +Date createdAt
+            +ObjectId salesPerson
+            +getLeads() List~Lead~
+            +createLead(data) Lead
+            +updateLead(id, data) Lead
+            +deleteLead(id) void
+            }
+
+            class Activity {
+            +ObjectId _id
+            +String subject
+            +String type
+            +String description
+            +String status
+            +Date date
+            +Date createdAt
+            +ObjectId contact
+            +ObjectId salesPerson
+            +getActivities() List~Activity~
+            +createActivity(data) Activity
+            +updateActivity(id, data) Activity
+            +deleteActivity(id) void
+            }
+
+            class Settings {
+            +ObjectId _id
+            +String[] activityTypes
+            +String[] offerStatuses
+            +String[] offerTypes
+            +String[] orderStatuses
+            +Boolean autoInvoice
+            +Boolean autoConvert
+            +Boolean strictRoles
+            +Date updatedAt
+            +getSettings() Settings
+            +updateSettings(data) Settings
+            }
+
+            class AuthController {
+            +login(email, password) Token
+            }
+
+            class UserController {
+            +getUsers() List~User~
+            +updateUser(id, data) User
+            +deleteUser(id) void
+            }
+
+            User "1" --> "1" Role : has
+            Role "1" --> "*" Permission : has
+            Contact "*" --> "1" User : assignedTo
+            Offer "*" --> "1" Contact : forClient
+            Offer "*" --> "1" User : createdBy
+            Offer "1" --> "*" OfferItem : contains
+            OfferItem "*" --> "1" Article : references
+            Order "*" --> "1" Contact : forClient
+            Order "*" --> "1" User : managedBy
+            Order "1" --> "0..1" Offer : fromOffer
+            Order "1" --> "*" OrderItem : contains
+            OrderItem "*" --> "1" Article : references
+            Order "1" --> "0..1" Invoice : linkedTo
+            Invoice "*" --> "1" Contact : billedTo
+            Lead "*" --> "1" User : followedBy
+            Activity "*" --> "1" Contact : relatedTo
+            Activity "*" --> "1" User : performedBy
+            UserController ..> User : manages
+            AuthController ..> User : authenticates
+        </div>
+    </div>
+
+    <p class="footer">Projet CRM MERN Stack — Rapport de Stage · Toutes les fonctions développées incluses</p>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, securityLevel: 'loose' });
+    </script>
+</body>
+
+</html>

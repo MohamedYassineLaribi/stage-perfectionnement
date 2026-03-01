@@ -1,0 +1,314 @@
+# Rapport Visuel : Architecture et Code Source
+
+Ce document présente l'architecture de votre application CRM ainsi que les extraits de code clés demandés. 
+
+> [!NOTE]
+> Vous pouvez capturer directement ces diagrammes et blocs de code (qui sont déjà colorés et formatés) pour les intégrer dans votre rapport. Pour les captures d'écran des interfaces web (Dashboard, Offres/Factures), il est recommandé de lancer l'application et de prendre des captures d'écran directement depuis votre navigateur avec de vraies données.
+
+## 1. Architecture Backend 
+
+L'architecture du backend suit le modèle MVC (Modèle-Vue-Contrôleur) avec une API RESTful Node.js / Express et MongoDB.
+
+```mermaid
+graph TD
+    Client[Client React / Navigateur] -->|Requêtes HTTP REST| API[API Express.js]
+    
+    subgraph "Couche Backend (Node.js)"
+        API -->|Routage| Routes[Routes Express]
+        Routes -->|Validation & Autorisation| Middleware[Middlewares authMiddleware]
+        Routes -->|Appel| Contolleur[Contrôleurs]
+        Contolleur -->|Opérations CRUD| Model[Modèles Mongoose]
+        
+        Contolleur -->|Authentification| JWT[JWT Token]
+        Contolleur -->|Hash Password| Bcrypt[Bcrypt]
+    end
+    
+    Model -.->|Requêtes Mongoose| DB[(Base de données MongoDB)]
+    
+    %% Styles
+    classDef client fill:#3498db,stroke:#2980b9,stroke-width:2px,color:white;
+    classDef api style fill:#2ecc71,stroke:#27ae60,stroke-width:2px,color:white;
+    classDef backend fill:#ecf0f1,stroke:#bdc3c7,stroke-width:2px;
+    classDef db fill:#f1c40f,stroke:#f39c12,stroke-width:2px;
+    
+    class Client client;
+    class API api;
+    class DB db;
+```
+
+---
+
+## 2. Architecture Frontend
+
+Le frontend est structuré en composants React avec un état géré via React Hooks et des requêtes API via Axios/React Query.
+
+```mermaid
+graph TD
+    subgraph "Couche Frontend (Vite + React)"
+        App[App.jsx - Point d'entrée] --> Router[React Router DOM]
+        Router --> Layout[Main Layout / Sidebar / Header]
+        
+        Layout --> Pages
+        
+        subgraph "Pages"
+            Pages --> Dash[Dashboard.jsx]
+            Pages --> Auth[Login.jsx / Register.jsx]
+            Pages --> Offers[OfferList / OfferForm]
+            Pages --> Inv[InvoiceList / InvoiceForm]
+        end
+        
+        Pages --> Components[Composants UI Réutilisables]
+        Pages --> Context[Auth Context / State Management]
+        Context --> Services[Services API Axios]
+    end
+    
+    Services -.->|Fetch/Post Data| API[API Backend REST]
+
+    %% Styles
+    classDef react fill:#61dafb,stroke:#282c34,stroke-width:2px;
+    classDef router fill:#ca4245,stroke:#282c34,stroke-width:2px,color:white;
+    classDef api fill:#2ecc71,stroke:#27ae60,stroke-width:2px,color:white;
+    
+    class App,Pages,Components react;
+    class Router router;
+    class API api;
+```
+
+---
+
+## 3. Schéma Mongoose : Collection Offres (Offer)
+
+Exemple d'implémentation de collection MongoDB utilisant Mongoose.
+
+```javascript
+const mongoose = require('mongoose');
+
+const offerSchema = new mongoose.Schema({
+    reference: { type: String, required: true, unique: true }, // ex. OFF-2023-0001
+    title: { type: String, required: true },
+    client: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact', required: true },
+    salesPerson: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    offerType: { type: String, default: 'Standard' },
+
+    items: [{
+        article: { type: mongoose.Schema.Types.ObjectId, ref: 'Article' },
+        description: String,
+        quantity: { type: Number, required: true, min: 1 },
+        unitPrice: { type: Number, required: true },
+        discount: { type: Number, default: 0 }, 
+        totalLine: { type: Number } 
+    }],
+
+    status: {
+        type: String,
+        enum: ['draft', 'sent', 'accepted', 'rejected', 'converted'],
+        default: 'draft'
+    },
+
+    totalAmountHT: { type: Number, default: 0 },
+    taxRate: { type: Number, default: 20 },
+    totalAmountTTC: { type: Number, default: 0 },
+
+    validUntil: { type: Date },
+    notes: { type: String },
+    
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+
+// Calcul automatique des totaux avant sauvegarde
+offerSchema.pre('save', function (next) {
+    let totalHT = 0;
+    this.items.forEach(item => {
+        const lineTotal = item.quantity * item.unitPrice * (1 - item.discount / 100);
+        item.totalLine = lineTotal;
+        totalHT += lineTotal;
+    });
+    this.totalAmountHT = totalHT;
+    this.totalAmountTTC = totalHT * (1 + this.taxRate / 100);
+    this.updatedAt = Date.now();
+    next();
+});
+
+module.exports = mongoose.model('Offer', offerSchema);
+```
+
+---
+
+## 4. Implémentation du Système d'Authentification
+
+Logique de login et création de token JWT dans [authRoutes.js](file:///d:/ISETN/DSI23/stage/projet%20VF/backend/routes/authRoutes.js).
+
+```javascript
+// @route   POST /api/auth/login
+// @desc    Authentifier utilisateur et obtenir le token
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        
+        // Recherche de l'utilisateur avec son rôle
+        const user = await User.findOne({ email }).populate('role');
+
+        // Vérification des credentials
+        if (user && (await user.comparePassword(password))) {
+            // Génération du token JWT
+            const token = jwt.sign(
+                { id: user._id }, 
+                process.env.JWT_SECRET, 
+                { expiresIn: '30d' }
+            );
+            
+            res.json({
+                token,
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                    avatar: user.avatar
+                }
+            });
+        } else {
+            res.status(401).json({ message: 'Email ou mot de passe invalide' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+```
+
+---
+
+## 5. Gestion des Offres et Factures (Contrôleur)
+
+Implémentation côté contrôleur pour la création d'une offre.
+
+```javascript
+// @route   POST /api/offers
+// @desc    Créer une nouvelle offre
+const createOffer = async (req, res) => {
+    try {
+        const { title, client, items, taxRate, validUntil, notes } = req.body;
+
+        // Génération automatique de la référence (ex: OFF-2024-XXXX)
+        const year = new Date().getFullYear();
+        const count = await Offer.countDocuments({ 
+            createdAt: { $gte: new Date(`${year}-01-01`) } 
+        });
+        const reference = `OFF-${year}-${String(count + 1).padStart(4, '0')}`;
+
+        const offer = new Offer({
+            reference,
+            title,
+            client,
+            salesPerson: req.user._id, // Assigné à l'utilisateur connecté
+            items,
+            taxRate: taxRate || 20, // 20% par défaut
+            validUntil,
+            notes
+        });
+
+        // Le pre-save hook calculera le totalAmountHT et totalAmountTTC automatiquement
+        const createdOffer = await offer.save();
+        res.status(201).json(createdOffer);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+```
+
+---
+
+## 6. Code Source du Dashboard (React Frontend)
+
+Exemple typique d'affichage dynamique avec cartes de KPI et graphique Chart.js pour le Dashboard.
+
+```jsx
+import React, { useState, useEffect } from 'react';
+import { Row, Col, Card } from 'react-bootstrap';
+import { Doughnut, Bar } from 'react-chartjs-2';
+import api from '../services/api';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
+
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
+
+const Dashboard = () => {
+    const [stats, setStats] = useState({
+        totalClients: 0,
+        totalOffers: 0,
+        totalInvoices: 0,
+        recentActivities: []
+    });
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                // Appel API pour récupérer les statistiques réelles
+                const { data } = await api.get('/dashboard/stats');
+                setStats(data);
+            } catch (error) {
+                console.error('Erreur lors du chargement des statistiques', error);
+            }
+        };
+        fetchDashboardData();
+    }, []);
+
+    const chartData = {
+        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jui'],
+        datasets: [{
+            label: 'Revenus (€)',
+            data: [12000, 19000, 3000, 5000, 2000, 30000],
+            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        }]
+    };
+
+    return (
+        <div className="dashboard-container">
+            <h2 className="mb-4">Vue d'ensemble</h2>
+            
+            <Row className="mb-4">
+                <Col md={4}>
+                    <Card className="shadow-sm widget-card text-center">
+                        <Card.Body>
+                            <Card.Title>Total Clients</Card.Title>
+                            <h3>{stats.totalClients}</h3>
+                        </Card.Body>
+                    </Card>
+                </Col>
+                <Col md={4}>
+                    <Card className="shadow-sm widget-card text-center">
+                        <Card.Body>
+                            <Card.Title>Offres Emises</Card.Title>
+                            <h3>{stats.totalOffers}</h3>
+                        </Card.Body>
+                    </Card>
+                </Col>
+                <Col md={4}>
+                    <Card className="shadow-sm widget-card text-center">
+                        <Card.Body>
+                            <Card.Title>Factures Payées</Card.Title>
+                            <h3>{stats.totalInvoices}</h3>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+
+            <Row>
+                <Col md={8}>
+                    <Card className="shadow-sm">
+                        <Card.Body>
+                            <Card.Title>Évolution des Revenus</Card.Title>
+                            <Bar data={chartData} options={{ responsive: true }} />
+                        </Card.Body>
+                    </Card>
+                </Col>
+                <Col md={4}>
+                    {/* ... liste des activités récentes ... */}
+                </Col>
+            </Row>
+        </div>
+    );
+};
+
+export default Dashboard;
+```

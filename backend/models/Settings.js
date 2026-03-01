@@ -22,6 +22,30 @@ const settingsSchema = new mongoose.Schema({
         autoConvert: { type: Boolean, default: false },
         strictRoles: { type: Boolean, default: true }
     },
+    notifications: {
+        emailNotif: { type: Boolean, default: true },
+        pushNotif: { type: Boolean, default: true },
+        weeklyReport: { type: Boolean, default: false }
+    },
+    enterprise: {
+        name: { type: String, default: 'CRM App' },
+        vat: { type: String, default: '' },
+        address: { type: String, default: '' },
+        phone: { type: String, default: '' },
+        currency: { type: String, default: 'Euro (€)' }
+    },
+    emailConfig: {
+        host: { type: String, default: 'smtp.crmapp.com' },
+        user: { type: String, default: 'noreply@crmapp.com' },
+        password: { type: String, default: '' },
+        port: { type: Number, default: 587 },
+        encryption: { type: String, default: 'TLS' }
+    },
+    backupConfig: {
+        autoBackup: { type: Boolean, default: true },
+        time: { type: String, default: '02:00' },
+        retentionDays: { type: Number, default: 30 }
+    },
     updatedAt: { type: Date, default: Date.now }
 });
 

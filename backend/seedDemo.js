@@ -8,24 +8,24 @@ const Order = require('./models/Order');
 const Activity = require('./models/Activity');
 const Settings = require('./models/Settings');
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/duralux_crm';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/crm_app';
 
 async function seedData() {
     try {
         await mongoose.connect(MONGODB_URI);
-        console.log('✅ Connecté à MongoDB pour le seeding');
+        console.log(' Connecté à MongoDB pour le seeding');
 
         // 1. Get Users
-        const adminUser = await User.findOne({ email: 'admin@duralux.com' });
-        const commUser = await User.findOne({ email: 'commercial@duralux.com' });
+        const adminUser = await User.findOne({ email: 'admin@crm.com' });
+        const commUser = await User.findOne({ email: 'commercial@crm.com' });
 
         if (!adminUser || !commUser) {
-            console.error('❌ Utilisateurs non trouvés. Lancez d\'abord le serveur pour initialiser les comptes.');
+            console.error(' Utilisateurs non trouvés. Lancez d\'abord le serveur pour initialiser les comptes.');
             return;
         }
 
         // 2. Create Articles
-        console.log('📦 Création des articles...');
+        console.log(' Création des articles...');
         await Article.deleteMany({});
         const articles = await Article.insertMany([
             { name: 'Ordinateur Portable XPS', description: 'Dell XPS 13, 16GB RAM, 512GB SSD', type: 'Product', price: 1200, stockQuantity: 10, isActive: true },
@@ -35,7 +35,7 @@ async function seedData() {
         ]);
 
         // 3. Create Contacts
-        console.log('👤 Création des contacts...');
+        console.log(' Création des contacts...');
         await Contact.deleteMany({});
         const contacts = await Contact.insertMany([
             { firstName: 'Alice', lastName: 'Martin', email: 'alice@techcorp.com', type: 'Company', companyName: 'TechCorp Solutions', phone: '0123456789', address: 'Paris, France', salesPerson: adminUser._id },
@@ -44,7 +44,7 @@ async function seedData() {
         ]);
 
         // 4. Create Offers
-        console.log('📄 Création des offres...');
+        console.log(' Création des offres...');
         await Offer.deleteMany({});
 
         // Offer for Admin
@@ -104,7 +104,7 @@ async function seedData() {
         });
 
         // 6. Create Activities
-        console.log('📅 Création des activités...');
+        console.log('Création des activités...');
         await Activity.deleteMany({});
         await Activity.insertMany([
             { subject: 'Appel de suivi TechCorp', type: 'Call', contact: contacts[0]._id, salesPerson: adminUser._id, date: new Date(), status: 'completed', description: 'Discussion sur le devis' },
@@ -116,7 +116,7 @@ async function seedData() {
         process.exit(0);
 
     } catch (error) {
-        console.error('❌ Erreur lors du seeding:', error);
+        console.error(' Erreur lors du seeding:', error);
         process.exit(1);
     }
 }

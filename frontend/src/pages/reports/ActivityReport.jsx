@@ -13,7 +13,8 @@ import {
     Legend,
     ArcElement,
     PointElement,
-    LineElement
+    LineElement,
+    RadialLinearScale
 } from 'chart.js';
 import { Bar, Radar } from 'react-chartjs-2';
 
@@ -23,6 +24,7 @@ ChartJS.register(
     BarElement,
     PointElement,
     LineElement,
+    RadialLinearScale,
     Title,
     Tooltip,
     Legend,

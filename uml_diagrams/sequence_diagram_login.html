@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagramme de Séquence - Login JWT</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #1a365d;
+            margin-bottom: 8px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #4a6fa5;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .description {
+            background: #e8f0fe;
+            border-left: 4px solid #1a365d;
+            border-radius: 6px;
+            padding: 12px 18px;
+            margin-bottom: 24px;
+            max-width: 900px;
+            font-size: 13px;
+            color: #1a365d;
+            line-height: 1.6;
+        }
+
+        .diagram-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 950px;
+            overflow-x: auto;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔄 Diagramme de Séquence</h1>
+    <p class="subtitle">Activité : Authentification Utilisateur — Fonction <code>login()</code></p>
+
+    <div class="description" style="max-width:950px;">
+        <strong>Fonctions impliquées :</strong>
+        <code>login()</code> (authController) →
+        <code>User.findOne()</code> (Mongoose) →
+        <code>comparePassword()</code> (User model) →
+        <code>Role.populate()</code> →
+        <code>jwt.sign()</code> →
+        Stockage dans <code>AuthContext</code> côté React
+    </div>
+
+    <div class="diagram-container">
+        <div class="mermaid">
+            %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#1a365d', 'primaryTextColor': '#ffffff',
+            'primaryBorderColor': '#2b4c8c', 'lineColor': '#4a6fa5', 'activationBkgColor': '#dbeafe',
+            'activationBorderColor': '#1a365d', 'noteBkgColor': '#fef9c3', 'noteTextColor': '#1a365d', 'fontSize':
+            '13px'}} }%%
+            sequenceDiagram
+            actor U as 👤 Utilisateur
+            participant FE as ⚛️ React Frontend
+            participant AX as 📡 Axios (intercepteur)
+            participant BE as 🟢 authController.login()
+            participant MW as 🔒 protect() middleware
+            participant DB as 🗄️ MongoDB
+
+            U->>FE: Saisit email & mot de passe
+            FE->>FE: Validation côté client (champs requis)
+
+            alt Formulaire invalide
+            FE-->>U: Affiche erreurs de validation
+            else Formulaire valide
+            FE->>AX: POST /api/auth/login { email, password }
+            AX->>BE: Requête transmise
+
+            activate BE
+            note right of BE: authController.login()
+
+            BE->>DB: User.findOne({ email })
+            activate DB
+            DB-->>BE: Document User ou null
+            deactivate DB
+
+            alt Utilisateur introuvable
+            BE-->>FE: 401 { message: 'Identifiants invalides' }
+            FE-->>U: Toast erreur — utilisateur non trouvé
+            else Utilisateur trouvé
+            BE->>BE: user.comparePassword(password)
+            note right of BE: bcrypt.compare(pwd, hash)
+
+            alt Mot de passe incorrect
+            BE-->>FE: 401 { message: 'Identifiants invalides' }
+            FE-->>U: Toast erreur — mot de passe incorrect
+            else Mot de passe correct
+            BE->>DB: User.populate('role').populate('permissions')
+            activate DB
+            DB-->>BE: User avec Role + Permissions
+            deactivate DB
+
+            BE->>BE: jwt.sign({ _id, role }) → TOKEN
+            note right of BE: Expiration: 30 jours
+            BE-->>AX: 200 OK { token, user: { name, role, avatar } }
+            deactivate BE
+
+            AX-->>FE: Réponse reçue
+            FE->>FE: localStorage.setItem('token', token)
+            FE->>FE: AuthContext.setUser(user)
+            FE->>FE: React Router → redirect('/dashboard')
+            FE-->>U: ✅ Connecté — Dashboard affiché
+
+            note over MW: Requêtes suivantes
+            FE->>MW: GET /api/... + Header: Authorization Bearer TOKEN
+            MW->>MW: jwt.verify(token, JWT_SECRET)
+            MW->>DB: User.findById(decoded._id).populate('role')
+            DB-->>MW: User authentifié
+            MW-->>BE: req.user = user → Accès autorisé
+            end
+            end
+            end
+        </div>
+    </div>
+
+    <p class="footer">Projet CRM MERN Stack — Rapport de Stage · Fonctions login(), comparePassword(), protect()</p>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, securityLevel: 'loose' });
+    </script>
+</body>
+
+</html>

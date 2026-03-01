@@ -20,9 +20,9 @@ const UserList = () => {
 
     // Mock data for demonstration
     const mockUsers = [
-        { _id: '1', name: 'Admin Principal', email: 'admin@duralux.com', role: { name: 'Admin' }, createdAt: new Date() },
-        { _id: '2', name: 'Jean Dupont', email: 'jean.dupont@duralux.com', role: { name: 'Commercial' }, createdAt: new Date() },
-        { _id: '3', name: 'Marie Martin', email: 'marie.martin@duralux.com', role: { name: 'Commercial' }, createdAt: new Date() }
+        { _id: '1', name: 'Admin Principal', email: 'admin@crmapp.com', role: { name: 'Admin' }, createdAt: new Date() },
+        { _id: '2', name: 'Jean Dupont', email: 'jean.dupont@crmapp.com', role: { name: 'Commercial' }, createdAt: new Date() },
+        { _id: '3', name: 'Marie Martin', email: 'marie.martin@crmapp.com', role: { name: 'Commercial' }, createdAt: new Date() }
     ];
 
     const fetchUsers = async () => {
@@ -150,7 +150,7 @@ const UserList = () => {
                                 required
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                placeholder="ex: jean@duralux.com"
+                                placeholder="ex: jean@crmapp.com"
                             />
                         </Form.Group>
 

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagramme de Cas d'Utilisation - CRM Application</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+
+    h1 {
+      font-size: 24px;
+      color: #1a365d;
+      margin-bottom: 8px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #4a6fa5;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .diagram-container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 1200px;
+      overflow-x: auto;
+    }
+
+    .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #888;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>📊 Diagramme de Cas d'Utilisation</h1>
+  <p class="subtitle">CRM Application — Toutes les fonctionnalités développées</p>
+
+  <div class="diagram-container">
+    <div class="mermaid">
+      %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#1a365d', 'primaryTextColor': '#fff',
+      'primaryBorderColor': '#2b4c8c', 'lineColor': '#4a6fa5', 'secondaryColor': '#e8f0fe', 'fontSize': '14px'}} }%%
+      graph LR
+      Admin(["👤 Admin"])
+      Commercial(["👤 Commercial"])
+      Systeme(["⚙️ Système"])
+
+      subgraph Auth["🔐 Authentification"]
+      direction TB
+      UC_login(["login()"])
+      end
+
+      subgraph Users["👤 Gestion Utilisateurs"]
+      direction TB
+      UC_getUsers(["getUsers()"])
+      UC_updateUser(["updateUser()"])
+      UC_deleteUser(["deleteUser()"])
+      end
+
+      subgraph Roles["🎭 Gestion Rôles"]
+      direction TB
+      UC_getRoles(["getRoles()"])
+      UC_createRole(["createRole()"])
+      UC_updateRole(["updateRole()"])
+      UC_deleteRole(["deleteRole()"])
+      end
+
+      subgraph Contacts["📇 Gestion Contacts"]
+      direction TB
+      UC_getContacts(["getContacts()"])
+      UC_getContactById(["getContactById()"])
+      UC_createContact(["createContact()"])
+      UC_updateContact(["updateContact()"])
+      UC_deleteContact(["deleteContact()"])
+      end
+
+      subgraph Articles["📦 Gestion Articles"]
+      direction TB
+      UC_getArticles(["getArticles()"])
+      UC_getArticleById(["getArticleById()"])
+      UC_createArticle(["createArticle()"])
+      UC_updateArticle(["updateArticle()"])
+      UC_deleteArticle(["deleteArticle()"])
+      end
+
+      subgraph Offres["📝 Gestion Offres"]
+      direction TB
+      UC_getOffers(["getOffers()"])
+      UC_getOfferById(["getOfferById()"])
+      UC_createOffer(["createOffer()"])
+      UC_updateOffer(["updateOffer()"])
+      UC_deleteOffer(["deleteOffer()"])
+      UC_convert(["convertOfferToOrder()"])
+      end
+
+      subgraph Orders["📋 Gestion Commandes"]
+      direction TB
+      UC_getOrders(["getOrders()"])
+      UC_getOrderById(["getOrderById()"])
+      UC_createOrder(["createOrder()"])
+      UC_updateStatus(["updateOrderStatus()"])
+      end
+
+      subgraph Invoices["🧾 Facturation"]
+      direction TB
+      UC_getInvoices(["getInvoices()"])
+      UC_getInvoiceById(["getInvoiceById()"])
+      UC_createInvoice(["createInvoice()"])
+      UC_pdfInvoice(["generateInvoicePdf()"])
+      end
+
+      subgraph Leads["🎯 Gestion Leads"]
+      direction TB
+      UC_getLeads(["getLeads()"])
+      UC_createLead(["createLead()"])
+      UC_updateLead(["updateLead()"])
+      UC_deleteLead(["deleteLead()"])
+      end
+
+      subgraph Activities["📅 Gestion Activités"]
+      direction TB
+      UC_getActivities(["getActivities()"])
+      UC_createActivity(["createActivity()"])
+      UC_updateActivity(["updateActivity()"])
+      UC_deleteActivity(["deleteActivity()"])
+      end
+
+      subgraph Params["⚙️ Paramètres"]
+      direction TB
+      UC_getSettings(["getSettings()"])
+      UC_updateSettings(["updateSettings()"])
+      end
+
+      %% Admin - full access
+      Admin --> UC_login
+      Admin --> UC_getUsers
+      Admin --> UC_updateUser
+      Admin --> UC_deleteUser
+      Admin --> UC_getRoles
+      Admin --> UC_createRole
+      Admin --> UC_updateRole
+      Admin --> UC_deleteRole
+      Admin --> UC_getContacts
+      Admin --> UC_getContactById
+      Admin --> UC_createContact
+      Admin --> UC_updateContact
+      Admin --> UC_deleteContact
+      Admin --> UC_getArticles
+      Admin --> UC_getArticleById
+      Admin --> UC_createArticle
+      Admin --> UC_updateArticle
+      Admin --> UC_deleteArticle
+      Admin --> UC_getOffers
+      Admin --> UC_getOfferById
+      Admin --> UC_createOffer
+      Admin --> UC_updateOffer
+      Admin --> UC_deleteOffer
+      Admin --> UC_convert
+      Admin --> UC_getOrders
+      Admin --> UC_getOrderById
+      Admin --> UC_createOrder
+      Admin --> UC_updateStatus
+      Admin --> UC_getInvoices
+      Admin --> UC_getInvoiceById
+      Admin --> UC_createInvoice
+      Admin --> UC_pdfInvoice
+      Admin --> UC_getLeads
+      Admin --> UC_createLead
+      Admin --> UC_updateLead
+      Admin --> UC_deleteLead
+      Admin --> UC_getActivities
+      Admin --> UC_createActivity
+      Admin --> UC_updateActivity
+      Admin --> UC_deleteActivity
+      Admin --> UC_getSettings
+      Admin --> UC_updateSettings
+
+      %% Commercial - restricted
+      Commercial --> UC_login
+      Commercial --> UC_getContacts
+      Commercial --> UC_getContactById
+      Commercial --> UC_createContact
+      Commercial --> UC_updateContact
+      Commercial --> UC_getArticles
+      Commercial --> UC_getArticleById
+      Commercial --> UC_createArticle
+      Commercial --> UC_updateArticle
+      Commercial --> UC_getOffers
+      Commercial --> UC_getOfferById
+      Commercial --> UC_createOffer
+      Commercial --> UC_updateOffer
+      Commercial --> UC_convert
+      Commercial --> UC_getOrders
+      Commercial --> UC_getOrderById
+      Commercial --> UC_updateStatus
+      Commercial --> UC_getInvoices
+      Commercial --> UC_getInvoiceById
+      Commercial --> UC_pdfInvoice
+      Commercial --> UC_getLeads
+      Commercial --> UC_createLead
+      Commercial --> UC_updateLead
+      Commercial --> UC_getActivities
+      Commercial --> UC_createActivity
+      Commercial --> UC_updateActivity
+      Commercial --> UC_getSettings
+
+      %% System auto actions
+      Systeme --> UC_convert
+      Systeme --> UC_createInvoice
+    </div>
+  </div>
+
+  <p class="footer">Projet CRM MERN Stack — Rapport de Stage · Toutes les fonctions développées incluses</p>
+
+  <script>
+    mermaid.initialize({ startOnLoad: true, securityLevel: 'loose' });
+  </script>
+</body>
+
+</html>

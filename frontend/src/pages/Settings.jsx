@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Button, Nav, Tab, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, Nav, Tab, Alert, Badge } from 'react-bootstrap';
 import { useAuth } from '../contexts/AuthContext';
 // Using feather-icons-react
 import FeatherIcon from 'feather-icons-react';
@@ -28,7 +28,7 @@ const Settings = ({ defaultTab = 'profile' }) => {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const [notifications, setNotifications] = useState(true);
+    const [notificationsPrefs, setNotificationsPrefs] = useState({ emailNotif: true, pushNotif: true, weeklyReport: false });
 
     // App Settings State (Persisted)
     const [activityTypes, setActivityTypes] = useState([]);
@@ -40,6 +40,10 @@ const Settings = ({ defaultTab = 'profile' }) => {
         autoConvert: false
     });
 
+    const [enterprise, setEnterprise] = useState({ name: '', vat: '', address: '', phone: '', currency: 'Euro (€)' });
+    const [emailConfig, setEmailConfig] = useState({ host: 'smtp.crmapp.com', user: 'noreply@crmapp.com', password: '', port: 587, encryption: 'TLS' });
+    const [backupConfig, setBackupConfig] = useState({ autoBackup: true, time: '02:00', retentionDays: 30 });
+
     useEffect(() => {
         const fetchSettings = async () => {
             try {
@@ -49,6 +53,10 @@ const Settings = ({ defaultTab = 'profile' }) => {
                 setOfferTypes(res.data.offerTypes || ['Standard', 'Récursion', 'Service', 'Produit']);
                 setOrderStatuses(res.data.orderStatuses || []);
                 setWorkflow(res.data.workflow || { autoInvoice: false, autoConvert: false });
+                if (res.data.notifications) setNotificationsPrefs(res.data.notifications);
+                if (res.data.enterprise) setEnterprise(res.data.enterprise);
+                if (res.data.emailConfig) setEmailConfig(res.data.emailConfig);
+                if (res.data.backupConfig) setBackupConfig(res.data.backupConfig);
             } catch (error) {
                 console.error("Erreur lors du chargement des paramètres", error);
             }
@@ -57,6 +65,15 @@ const Settings = ({ defaultTab = 'profile' }) => {
             fetchSettings();
         }
     }, [user]);
+
+    const handleSaveSection = async (sectionData, sectionName) => {
+        try {
+            await api.put('/settings', sectionData);
+            toast.success(`Configuration ${sectionName} enregistrée !`);
+        } catch (error) {
+            toast.error("Erreur lors de la sauvegarde : " + (error.response?.data?.message || error.message));
+        }
+    };
 
     const handleSaveCRM = async () => {
         try {
@@ -311,22 +328,26 @@ const Settings = ({ defaultTab = 'profile' }) => {
                                             type="switch"
                                             id="email-notif"
                                             label="Recevoir des notifications par email"
-                                            checked={notifications}
-                                            onChange={(e) => setNotifications(e.target.checked)}
+                                            checked={notificationsPrefs.emailNotif}
+                                            onChange={(e) => setNotificationsPrefs({ ...notificationsPrefs, emailNotif: e.target.checked })}
                                             className="mb-3"
                                         />
                                         <Form.Check
                                             type="switch"
                                             id="push-notif"
                                             label="Activer les notifications push"
-                                            defaultChecked
+                                            checked={notificationsPrefs.pushNotif}
+                                            onChange={(e) => setNotificationsPrefs({ ...notificationsPrefs, pushNotif: e.target.checked })}
                                             className="mb-3"
                                         />
                                         <Form.Check
                                             type="switch"
                                             id="weekly-report"
                                             label="Recevoir le rapport hebdomadaire"
+                                            checked={notificationsPrefs.weeklyReport}
+                                            onChange={(e) => setNotificationsPrefs({ ...notificationsPrefs, weeklyReport: e.target.checked })}
                                         />
+                                        <Button variant="primary" className="mt-3" onClick={() => handleSaveSection({ notifications: notificationsPrefs }, 'Notifications')}>Enregistrer</Button>
                                     </Card.Body>
                                 </Card>
                             </Tab.Pane>
@@ -340,31 +361,31 @@ const Settings = ({ defaultTab = 'profile' }) => {
                                             <Row>
                                                 <Col md={12} className="mb-3">
                                                     <Form.Label>Hôte SMTP</Form.Label>
-                                                    <Form.Control type="text" defaultValue="smtp.duralux.com" />
+                                                    <Form.Control type="text" value={emailConfig.host} onChange={e => setEmailConfig({ ...emailConfig, host: e.target.value })} />
                                                 </Col>
                                                 <Col md={6} className="mb-3">
                                                     <Form.Label>Utilisateur</Form.Label>
-                                                    <Form.Control type="text" defaultValue="noreply@duralux.com" />
+                                                    <Form.Control type="text" value={emailConfig.user} onChange={e => setEmailConfig({ ...emailConfig, user: e.target.value })} />
                                                 </Col>
                                                 <Col md={6} className="mb-3">
                                                     <Form.Label>Mot de passe</Form.Label>
-                                                    <Form.Control type="password" defaultValue="********" />
+                                                    <Form.Control type="password" value={emailConfig.password} onChange={e => setEmailConfig({ ...emailConfig, password: e.target.value })} />
                                                 </Col>
                                                 <Col md={6} className="mb-3">
                                                     <Form.Label>Port</Form.Label>
-                                                    <Form.Control type="number" defaultValue="587" />
+                                                    <Form.Control type="number" value={emailConfig.port} onChange={e => setEmailConfig({ ...emailConfig, port: e.target.value })} />
                                                 </Col>
                                                 <Col md={6} className="mb-3">
                                                     <Form.Label>Chiffrement</Form.Label>
-                                                    <Form.Select>
+                                                    <Form.Select value={emailConfig.encryption} onChange={e => setEmailConfig({ ...emailConfig, encryption: e.target.value })}>
                                                         <option>TLS</option>
                                                         <option>SSL</option>
                                                         <option>Aucun</option>
                                                     </Form.Select>
                                                 </Col>
                                             </Row>
-                                            <Button variant="primary">Tester la connexion</Button>
-                                            <Button variant="light" className="ms-2">Enregistrer</Button>
+                                            <Button variant="primary" className="me-2">Tester la connexion</Button>
+                                            <Button variant="primary" onClick={() => handleSaveSection({ emailConfig }, 'Serveur Email')}>Enregistrer</Button>
                                         </Form>
                                     </Card.Body>
                                 </Card>
@@ -379,29 +400,29 @@ const Settings = ({ defaultTab = 'profile' }) => {
                                             <Row>
                                                 <Col md={6} className="mb-3">
                                                     <Form.Label>Nom de l'Entreprise</Form.Label>
-                                                    <Form.Control type="text" defaultValue="CRM App" />
+                                                    <Form.Control type="text" value={enterprise.name} onChange={e => setEnterprise({ ...enterprise, name: e.target.value })} />
                                                 </Col>
                                                 <Col md={6} className="mb-3">
                                                     <Form.Label>N° de TVA Intracommunautaire</Form.Label>
-                                                    <Form.Control type="text" defaultValue="FR 12 345 678 901" />
+                                                    <Form.Control type="text" value={enterprise.vat} onChange={e => setEnterprise({ ...enterprise, vat: e.target.value })} />
                                                 </Col>
                                                 <Col md={12} className="mb-3">
                                                     <Form.Label>Adresse</Form.Label>
-                                                    <Form.Control as="textarea" rows={2} defaultValue="123 Avenue de la Rénovation, 75000 Paris" />
+                                                    <Form.Control as="textarea" rows={2} value={enterprise.address} onChange={e => setEnterprise({ ...enterprise, address: e.target.value })} />
                                                 </Col>
                                                 <Col md={6} className="mb-3">
                                                     <Form.Label>Téléphone</Form.Label>
-                                                    <Form.Control type="text" defaultValue="+33 1 23 45 67 89" />
+                                                    <Form.Control type="text" value={enterprise.phone} onChange={e => setEnterprise({ ...enterprise, phone: e.target.value })} />
                                                 </Col>
                                                 <Col md={6} className="mb-3">
                                                     <Form.Label>Devise par défaut</Form.Label>
-                                                    <Form.Select>
+                                                    <Form.Select value={enterprise.currency} onChange={e => setEnterprise({ ...enterprise, currency: e.target.value })}>
                                                         <option>Euro (€)</option>
                                                         <option>Dollar ($)</option>
                                                     </Form.Select>
                                                 </Col>
                                             </Row>
-                                            <Button variant="primary">Mettre à jour les infos</Button>
+                                            <Button variant="primary" onClick={() => handleSaveSection({ enterprise }, 'Entreprise')}>Mettre à jour les infos</Button>
                                         </Form>
                                     </Card.Body>
                                 </Card>
@@ -532,17 +553,19 @@ const Settings = ({ defaultTab = 'profile' }) => {
                                                     type="switch"
                                                     id="auto-backup"
                                                     label="Activer la sauvegarde automatique quotidienne"
-                                                    defaultChecked
+                                                    checked={backupConfig.autoBackup}
+                                                    onChange={e => setBackupConfig({ ...backupConfig, autoBackup: e.target.checked })}
                                                     className="mb-2"
                                                 />
                                                 <Form.Group className="mb-3">
                                                     <Form.Label>Heure de sauvegarde</Form.Label>
-                                                    <Form.Control type="time" defaultValue="02:00" style={{ maxWidth: '200px' }} />
+                                                    <Form.Control type="time" value={backupConfig.time} onChange={e => setBackupConfig({ ...backupConfig, time: e.target.value })} style={{ maxWidth: '200px' }} />
                                                 </Form.Group>
                                                 <Form.Group className="mb-3">
                                                     <Form.Label>Conservation des sauvegardes (jours)</Form.Label>
-                                                    <Form.Control type="number" defaultValue="30" style={{ maxWidth: '200px' }} />
+                                                    <Form.Control type="number" value={backupConfig.retentionDays} onChange={e => setBackupConfig({ ...backupConfig, retentionDays: e.target.value })} style={{ maxWidth: '200px' }} />
                                                 </Form.Group>
+                                                <Button variant="primary" size="sm" onClick={() => handleSaveSection({ backupConfig }, 'Sauvegarde')}>Enregistrer Paramètres Sauvegarde</Button>
                                             </div>
                                             <hr />
                                             <div className="mb-4">

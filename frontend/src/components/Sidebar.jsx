@@ -129,9 +129,16 @@ const Sidebar = ({ collapsed, mobileOpen, onToggle, onMobileClose }) => {
                     }}
                 >
                     <div className="m-header d-flex justify-content-center align-items-center py-4">
-                        <Link to="/" className="b-brand d-flex align-items-center gap-2 text-decoration-none">
-                            <img src="/crm-logo.png" alt="CRM App Logo" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
-                            {!collapsed && <span className="fw-bolder fs-4 text-dark tracking-wide">CRM App</span>}
+                        <Link to="/" className="b-brand text-decoration-none">
+                            <span className="fw-bolder fs-4 text-dark tracking-wide" style={{
+                                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                backgroundClip: 'text'
+                            }}>
+                                {!collapsed && 'CRM App'}
+                                {collapsed && <span style={{ fontSize: '18px' }}>CRM</span>}
+                            </span>
                         </Link>
                     </div>
 

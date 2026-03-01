@@ -19,7 +19,7 @@ const GeneralSettings = () => (
                                 </div>
                                 <div className="col-md-6">
                                     <label className="form-label">System Email</label>
-                                    <input type="email" className="form-control" defaultValue="admin@duralux.com" />
+                                    <input type="email" className="form-control" defaultValue="admin@crmapp.com" />
                                 </div>
                             </div>
                             <div className="mb-4">

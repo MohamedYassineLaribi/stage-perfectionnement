@@ -75,7 +75,7 @@ const InvoiceView = () => {
                 <Card.Body className="p-5">
                     <Row className="mb-5">
                         <Col>
-                            <h2 className="fw-bold text-primary">DURALUX</h2>
+                            <h2 className="fw-bold text-primary">CRM APP</h2>
                             <p className="mb-0">123 Avenue de la Rénovation</p>
                             <p>75000 Paris, France</p>
                         </Col>

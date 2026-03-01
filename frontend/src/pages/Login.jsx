@@ -30,7 +30,15 @@ const Login = () => {
                 <Card className="shadow-lg border-0 rounded-lg">
                     <Card.Body className="p-5">
                         <div className="text-center mb-4">
-                            <h2 className="fw-bold text-primary">CRM App</h2>
+                            <h2 className="fw-bold mb-2" style={{
+                                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                backgroundClip: 'text',
+                                fontSize: '2.5rem'
+                            }}>
+                                CRM App
+                            </h2>
                             <p className="text-muted">Connectez-vous à votre compte</p>
                         </div>
                         {error && <Alert variant="danger">{error}</Alert>}
@@ -65,7 +73,7 @@ const Login = () => {
                         </Form>
                     </Card.Body>
                     <Card.Footer className="text-center py-3 bg-light border-0 rounded-bottom">
-                        <small className="text-muted">&copy; 2024 CRM</small>
+                        <small className="text-muted">&copy; 2026 CRM</small>
                     </Card.Footer>
                 </Card>
             </div>

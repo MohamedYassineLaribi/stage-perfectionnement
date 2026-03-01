@@ -17,7 +17,7 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
     console.log('╔════════════════════════════════════════════╗');
     console.log('║                                            ║');
-    console.log('║       Duralux CRM - Serveur Démarré       ║');
+    console.log('║       CRM App - Serveur Démarré        ║');
     console.log('║                                            ║');
     console.log('╚════════════════════════════════════════════╝');
     console.log('');
